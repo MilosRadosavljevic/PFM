@@ -13,14 +13,13 @@ namespace PFM.Controllers
     public class TransactionController : ControllerBase
     {
         ITransactionService _transactionService;
-        ITransactionSplitService _transactionSplitService;
         private readonly ILogger<TransactionController> _logger;
 
-        public TransactionController(ILogger<TransactionController> logger, ITransactionService transactionService, ITransactionSplitService transactionSplitService)
-        {
+        public TransactionController(ILogger<TransactionController> logger, ITransactionService transactionService)
+        { 
             _logger = logger;
             _transactionService = transactionService;
-            _transactionSplitService = transactionSplitService;
+
         }
 
         [HttpGet]
@@ -64,23 +63,17 @@ namespace PFM.Controllers
             }
         }
 
-        //[HttpPost("{transactionid}/split")]
-        //public async Task<IActionResult> SplitTransactions(string transactionId, [FromBody] List<TransactionSplitEntity> splits)
-        //{
-        //    var isSplited = await _transactionSplitService.SplitTransaction(transactionId, splits);
-        //    if (isSplited)
-        //    {
-        //        return Ok("Transakcija je uspesno podeljena!");
-        //    }
-        //    return NotFound("Transakcija nije pronadjena!");
-        //}
+        [HttpPost("{transactionid}/split")]
+        public async Task<IActionResult> SplitTransactions()
+        {
+            return Ok();
+        }
 
         [HttpPost("{transactionId}/categorize")]
         public async Task<IActionResult> CategorizeTransactions(string transactionId, [FromBody] CategorizeTransactionCommand categorizeTransactionCommand)
         {
             var transactionToCategorize = await _transactionService.CategorizeTransaction(transactionId, categorizeTransactionCommand);
             return Ok(transactionToCategorize);
-            //return Ok();
         }
 
         //[HttpPost("auto-categorize")]

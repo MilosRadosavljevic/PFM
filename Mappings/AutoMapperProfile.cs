@@ -36,21 +36,6 @@ namespace PFM.Mappings
             CreateMap<CreateCategoryCommand, CategoryEntity>()
                 .ForMember(ent => ent.Code, ccc => ccc.MapFrom(x => x.CategoryCode));
 
-
-
-            //  for transaction-splits
-            //CreateMap<TransactionSplitEntity, TransactionSplit>()
-            //    .ForMember(ts => ts.SplitId, ent => ent.MapFrom(x => x.Id));
-
-            //CreateMap<TransactionSplit, TransactionSplitEntity>()
-            //    .ForMember(ent => ent.Id, ts => ts.MapFrom(x => x.SplitId));
-
-            //CreateMap<CreateTransactionSplitCommand, TransactionSplitEntity>()
-            //    .ForMember(ent => ent.Id, cts => cts.MapFrom(x => x.SplitId));
-
-
-
-
         }
     }
 }

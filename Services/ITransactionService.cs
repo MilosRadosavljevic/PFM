@@ -18,6 +18,5 @@ namespace PFM.Services
             TransactionKind? transactionKind);
 
         Task<Transaction> CategorizeTransaction(string transactionId, CategorizeTransactionCommand categorizeTransactionCommand);
-        //Task <TransactionSplit> SplitTransaction(string transactionId, CreateTransactionSplitCommand createTransactionSplitCommand);
     }
 }

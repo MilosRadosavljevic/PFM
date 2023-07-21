@@ -162,9 +162,26 @@ namespace PFM.Database.Repositories
             return transactions;
         }
 
-        public async Task<List<TransactionEntity>> GetAllTransactionsForAnalytics()
+        public async Task<List<TransactionEntity>> GetAllTransactionsForAnalytics(string? categoryCode, DateTime? startDate, DateTime? endDate, Direction? direction)
         {
-            return await _dbContext.Transactions.ToListAsync();
+            var query = _dbContext.Transactions.AsQueryable();
+
+            if (startDate.HasValue)
+            {
+                query = query.Where(x => x.Date >= startDate.Value);
+            }
+            if (endDate.HasValue)
+            {
+                query = query.Where(x => x.Date <= endDate.Value);
+            }
+            if (direction.HasValue)
+            {
+                query = query.Where(x => x.Direction == direction);
+            }
+
+            var transactions = await query.ToListAsync();
+
+            return transactions;
         }
     }
 }

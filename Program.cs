@@ -13,8 +13,6 @@ builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
-builder.Services.AddScoped<ITransactionSplitService, TransactionSplitService>();
-builder.Services.AddScoped<ITransactionSplitRepository, TransactionSplitRepository>();
 
 
 // AutoMapper definition

@@ -83,29 +83,6 @@ namespace PFM.Migrations
 
                     b.ToTable("transactions", (string)null);
                 });
-
-            modelBuilder.Entity("PFM.Database.Entities.TransactionSplitEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<double>("Amount")
-                        .HasColumnType("double precision");
-
-                    b.Property<string>("CatCode")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("TransactionId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("transaction-splits", (string)null);
-                });
 #pragma warning restore 612, 618
         }
     }

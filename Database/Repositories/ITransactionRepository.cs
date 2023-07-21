@@ -25,6 +25,6 @@ namespace PFM.Database.Repositories
             DateTime? endDate,
             Direction? direction);
 
-        Task<List<TransactionEntity>> GetAllTransactionsForAnalytics();
+        Task<List<TransactionEntity>> GetAllTransactionsForAnalytics(string? categoryCode, DateTime? startDate, DateTime? endDate, Direction? direction);
     }
 }

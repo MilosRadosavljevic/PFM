@@ -20,7 +20,7 @@ namespace PFM.Services
 
             if (string.IsNullOrEmpty(categoryCode))
             {
-                transactions = await _transactionRepository.GetAllTransactionsForAnalytics();
+                transactions = await _transactionRepository.GetAllTransactionsForAnalytics(categoryCode, startDate, endDate, direction);
 
                 var spendingAnalytics = transactions
                     .Where(c => c.catCode != null)
@@ -46,7 +46,7 @@ namespace PFM.Services
                         {
                             // Pronađena je osnovna kategorija, treba joj dodati potrošnju
                             var mainGroup = spendingAnalytics.FirstOrDefault(g => g.CatCode == mainCategory.Code);
-                            if (mainGroup != null)
+                            if (mainGroup != null || mainCategory.Code != null)
                             {
                                 mainGroup.Amount += group.Amount;
                                 mainGroup.Count += group.Count;

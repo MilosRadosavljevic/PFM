@@ -71,31 +71,5 @@ namespace PFM.Services
             await _transactionRepository.UpdateTransaction(transaction);
             return _mapper.Map<Transaction>(transaction);
         }
-
-        //public async Task<TransactionSplit> SplitTransaction(string transactionId, CreateTransactionSplitCommand createTransactionSplitCommand)
-        //{
-        //    var checkIfTransactionExists = await CheckIfTransactionExistsAsync(transactionId);
-        //    var checkIfCategoryExists = await CheckIfCategoryExists(createTransactionSplitCommand.CatCode);
-        //    if (!checkIfTransactionExists && !checkIfCategoryExists)
-        //    {
-        //        var newTransactionSplit = _mapper.Map<TransactionSplitEntity>(createTransactionSplitCommand);
-        //        await _transactionRepository.CreateTransactionSplit(newTransactionSplit);
-        //        return _mapper.Map<TransactionSplit>(newTransactionSplit);
-        //    }
-        //    return null;
-
-        //}
-
-        //private async Task<bool> CheckIfCategoryExists(string categoryCode)
-        //{
-        //    var category = await _categoryRepository.GetCategoryByCode(categoryCode);
-        //    if (category == null)
-        //    {
-        //        return false;
-        //    }
-        //    return true;
-        //}
-
-
     }
 }
