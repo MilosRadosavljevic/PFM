@@ -1,11 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using PFM.Database.Entities;
+﻿using PFM.Database.Entities;
 using PFM.Models;
 
 namespace PFM.Database.Repositories
 {
     public interface ICategoryRepository
     {
-        Task<PagedSortedList<CategoryEntity>> GetCategories(int pageSize = 20,  int page = 1, SortOrder sortOrder = SortOrder.Asc, string? sortby = null);
+        Task<CategoryEntity> CreateCategory(CategoryEntity newCategoryEntity);
+        Task<CategoryEntity> GetCategoryByCode(string categoryCode);
+        Task<PagedSortListItems<CategoryEntity>> GetGategories(string parentId);
+        Task<CategoryEntity> UpdateCategory(CategoryEntity existingCategory);
+        Task<List<CategoryEntity>> GetAllCategories();
     }
 }

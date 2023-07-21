@@ -6,58 +6,60 @@ namespace PFM.Database.Repositories
 {
     public class CategoryRepository : ICategoryRepository
     {
-        CategoryDbContext _dbContext;
+        PfmDbContext _dbContext;
 
-        public CategoryRepository(CategoryDbContext dbContext)
+        public CategoryRepository(PfmDbContext dbContext)
         {
             _dbContext = dbContext;
         }
 
-        //public async Task<TransactionEntity> CreateTransaction(TransactionEntity newTransactionEntity)
-        //{
-        //    _dbContext.Transactions.Add(newTransactionEntity);
-        //    await _dbContext.SaveChangesAsync();
-        //    return newTransactionEntity;
-        //}
+        public async Task<CategoryEntity> UpdateCategory(CategoryEntity existingCategory)
+        {
+            _dbContext.Categories.Update(existingCategory);
+            await _dbContext.SaveChangesAsync();
+            return existingCategory;
+        }
 
-        public async Task<PagedSortedList<CategoryEntity>> GetCategories(int pageSize = 20, int page = 1, SortOrder sortOrder = SortOrder.Asc, string? sortBy = null)
+        public async Task<CategoryEntity> CreateCategory(CategoryEntity newCategoryEntity)
+        {
+            _dbContext.Categories.Add(newCategoryEntity);
+            await _dbContext.SaveChangesAsync();
+            return newCategoryEntity;
+        }
+
+
+        public async Task<CategoryEntity> GetCategoryByCode(string categoryCode)
+        {
+            return await _dbContext.Categories.FirstOrDefaultAsync(x => x.Code.Equals(categoryCode));
+        }
+
+        public async Task<List<CategoryEntity>> GetAllCategories()
+        {
+            return await _dbContext.Categories.ToListAsync();
+        }
+
+        public async Task<PagedSortListItems<CategoryEntity>> GetGategories(string parentId)
         {
             var query = _dbContext.Categories.AsQueryable();
-            var totalCount = query.Count();
-            var totalPages = (int)Math.Ceiling(totalCount * 1.0 /pageSize);
 
-            if (!String.IsNullOrEmpty(sortBy))
+            if (parentId != null)
             {
-                switch (sortBy)
+                var categories = await query
+                    .Where(x => x.ParentCode == parentId)
+                    .ToListAsync();
+                return new PagedSortListItems<CategoryEntity>
                 {
-                    case "code":
-                        query = sortOrder == SortOrder.Asc ? query.OrderBy(x => x.Code) : query.OrderByDescending(x => x.Code);
-                        break;
-
-                    //category code?
-                    //case "date":
-                    //    query = sortOrder == SortOrder.Asc ? query.OrderBy(x => x.Date) : query.OrderByDescending(x => x.Date);
-                    //    break;
-                }
+                    Items = categories
+                };
             }
-
-            query = query.Skip((page - 1) * pageSize).Take(pageSize);
-
-            var categories = await query.ToListAsync();
-
-            return new PagedSortedList<CategoryEntity>
+            else
             {
-                // da li je potrebno ovo?
-                //TotalPages = totalPages,
-                TotalCount = totalCount,
-                Page = page,
-                PageSize = pageSize,
-                SortBy = sortBy,
-                SortOrder = sortOrder,
-                Items = categories,
-
-
-            };
+                var categories = await query.ToListAsync();
+                return new PagedSortListItems<CategoryEntity>
+                {
+                    Items = categories
+                };
+            }
         }
     }
 }

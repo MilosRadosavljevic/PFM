@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using PFM.Commands;
 using PFM.Database.Entities;
 using PFM.Database.Repositories;
@@ -8,12 +9,14 @@ namespace PFM.Services
 {
     public class TransactionService : ITransactionService
     {
-        ITransactionRepository _repository;
+        ITransactionRepository _transactionRepository;
+        ICategoryRepository _categoryRepository;
         IMapper _mapper;
 
-        public TransactionService(ITransactionRepository repository, IMapper mapper)
+        public TransactionService(ITransactionRepository transactionRepository, ICategoryRepository categoryRepository, IMapper mapper)
         {
-            _repository = repository;
+            _transactionRepository = transactionRepository;
+            _categoryRepository = categoryRepository;
             _mapper = mapper;
         }
 
@@ -23,27 +26,76 @@ namespace PFM.Services
             if (!checkIfTransactionExists)
             {
                 var newTransactionEntity = _mapper.Map<TransactionEntity>(createTransactionCommand);
-                await _repository.CreateTransaction(newTransactionEntity);
+                await _transactionRepository.CreateTransaction(newTransactionEntity);
                 return _mapper.Map<Transaction>(newTransactionEntity);
             }
             return null;
         }
 
-        public async Task<PagedSortedList<Transaction>> GetTransactions(int page, int pageSize, SortOrder sortOrder, string? sortBy)
+        public async Task<PagedSortedListTransactions<Transaction>> GetTransactions(
+            int page,
+            int pageSize,
+            SortOrder sortOrder,
+            string? sortBy,
+            DateTime? startDate,
+            DateTime? endDate,
+            TransactionKind? transactionKind)
         {
-            var transactions = await _repository.GetProducts(page, pageSize, sortOrder, sortBy);
-            return _mapper.Map<PagedSortedList<Transaction>>(transactions);
+            var transactions = await _transactionRepository.GetTransactions(page, pageSize, sortOrder, sortBy,
+                startDate, endDate, transactionKind);
+            return _mapper.Map<PagedSortedListTransactions<Transaction>>(transactions);
         }
 
 
         private async Task<bool> CheckIfTransactionExistsAsync(string transactionId)
         {
-            var transaction = await _repository.GetTransactionById(transactionId);
+            var transaction = await _transactionRepository.GetTransactionById(transactionId);
             if (transaction == null)
             {
                 return false;
             }
             return true;
         }
+
+        public async Task<Transaction> CategorizeTransaction(string transctionId, CategorizeTransactionCommand categorizeTransactionCommand)
+        {
+            var transaction = await _transactionRepository.GetTransactionById(transctionId);
+            var category = await _categoryRepository.GetCategoryByCode(categorizeTransactionCommand.CategoryCode);
+
+            if (transaction == null || category == null)
+            {
+                throw new Exception("Invalid transaction or category.");
+            }
+
+            transaction.catCode = categorizeTransactionCommand.CategoryCode;
+            await _transactionRepository.UpdateTransaction(transaction);
+            return _mapper.Map<Transaction>(transaction);
+        }
+
+        //public async Task<TransactionSplit> SplitTransaction(string transactionId, CreateTransactionSplitCommand createTransactionSplitCommand)
+        //{
+        //    var checkIfTransactionExists = await CheckIfTransactionExistsAsync(transactionId);
+        //    var checkIfCategoryExists = await CheckIfCategoryExists(createTransactionSplitCommand.CatCode);
+        //    if (!checkIfTransactionExists && !checkIfCategoryExists)
+        //    {
+        //        var newTransactionSplit = _mapper.Map<TransactionSplitEntity>(createTransactionSplitCommand);
+        //        await _transactionRepository.CreateTransactionSplit(newTransactionSplit);
+        //        return _mapper.Map<TransactionSplit>(newTransactionSplit);
+        //    }
+        //    return null;
+
+        //}
+
+        //private async Task<bool> CheckIfCategoryExists(string categoryCode)
+        //{
+        //    var category = await _categoryRepository.GetCategoryByCode(categoryCode);
+        //    if (category == null)
+        //    {
+        //        return false;
+        //    }
+        //    return true;
+        //}
+
+
     }
 }

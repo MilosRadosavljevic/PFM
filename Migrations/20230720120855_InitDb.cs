@@ -5,10 +5,23 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace PFM.Migrations
 {
-    public partial class InitDb : Migration
+    public partial class InitDbCategory : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "categories",
+                columns: table => new
+                {
+                    Code = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    ParentCode = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_categories", x => x.Code);
+                });
+
             migrationBuilder.CreateTable(
                 name: "transactions",
                 columns: table => new
@@ -21,7 +34,8 @@ namespace PFM.Migrations
                     Description = table.Column<string>(type: "character varying(1024)", maxLength: 1024, nullable: false),
                     Currency = table.Column<string>(type: "text", nullable: false),
                     MccCode = table.Column<string>(type: "text", nullable: true),
-                    Kind = table.Column<string>(type: "text", nullable: false)
+                    Kind = table.Column<string>(type: "text", nullable: false),
+                    catCode = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -31,6 +45,9 @@ namespace PFM.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "categories");
+
             migrationBuilder.DropTable(
                 name: "transactions");
         }

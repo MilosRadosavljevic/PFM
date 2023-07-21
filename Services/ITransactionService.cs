@@ -1,4 +1,5 @@
 ﻿using PFM.Commands;
+using PFM.Database.Entities;
 using PFM.Models;
 
 namespace PFM.Services
@@ -6,7 +7,17 @@ namespace PFM.Services
     public interface ITransactionService
     {
 
-        Task<Transaction> CreateTransaction(CreateTransactionCommand createTransactionCommand);
-        Task<PagedSortedList<Transaction>> GetTransactions(int page, int pageSize, SortOrder sortOrder, string? sortBy);
+        Task <Transaction> CreateTransaction(CreateTransactionCommand createTransactionCommand);
+        Task <PagedSortedListTransactions<Transaction>> GetTransactions(
+            int page,
+            int pageSize,
+            SortOrder sortOrder,
+            string? sortBy,
+            DateTime? startDate,
+            DateTime? endDate,
+            TransactionKind? transactionKind);
+
+        Task<Transaction> CategorizeTransaction(string transactionId, CategorizeTransactionCommand categorizeTransactionCommand);
+        //Task <TransactionSplit> SplitTransaction(string transactionId, CreateTransactionSplitCommand createTransactionSplitCommand);
     }
 }

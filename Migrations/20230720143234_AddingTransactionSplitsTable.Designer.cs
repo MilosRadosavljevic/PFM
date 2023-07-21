@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PFM.Database;
@@ -10,10 +11,11 @@ using PFM.Database;
 
 namespace PFM.Migrations
 {
-    [DbContext(typeof(TransactionDbContext))]
-    partial class TransactionDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(PfmDbContext))]
+    [Migration("20230720143234_AddingTransactionSplitsTable")]
+    partial class AddingTransactionSplitsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,6 +23,24 @@ namespace PFM.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("PFM.Database.Entities.CategoryEntity", b =>
+                {
+                    b.Property<string>("Code")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("ParentCode")
+                        .HasColumnType("text");
+
+                    b.HasKey("Code");
+
+                    b.ToTable("categories", (string)null);
+                });
 
             modelBuilder.Entity("PFM.Database.Entities.TransactionEntity", b =>
                 {
@@ -58,9 +78,35 @@ namespace PFM.Migrations
                     b.Property<string>("MccCode")
                         .HasColumnType("text");
 
+                    b.Property<string>("catCode")
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
                     b.ToTable("transactions", (string)null);
+                });
+
+            modelBuilder.Entity("PFM.Database.Entities.TransactionSplitEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<double>("Amount")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("CatCode")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("TransactionId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("transaction-splits", (string)null);
                 });
 #pragma warning restore 612, 618
         }

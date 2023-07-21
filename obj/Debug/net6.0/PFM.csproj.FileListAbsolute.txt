@@ -43,3 +43,7 @@ C:\Users\milos\source\repos\PFM\PFM\obj\Debug\net6.0\refint\PFM.dll
 C:\Users\milos\source\repos\PFM\PFM\obj\Debug\net6.0\PFM.pdb
 C:\Users\milos\source\repos\PFM\PFM\obj\Debug\net6.0\PFM.genruntimeconfig.cache
 C:\Users\milos\source\repos\PFM\PFM\obj\Debug\net6.0\ref\PFM.dll
+C:\Users\milos\source\repos\PFM\PFM\bin\Debug\net6.0\Microsoft.AspNetCore.JsonPatch.dll
+C:\Users\milos\source\repos\PFM\PFM\bin\Debug\net6.0\Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
+C:\Users\milos\source\repos\PFM\PFM\bin\Debug\net6.0\Newtonsoft.Json.dll
+C:\Users\milos\source\repos\PFM\PFM\bin\Debug\net6.0\Newtonsoft.Json.Bson.dll

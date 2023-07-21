@@ -1,16 +1,11 @@
-﻿using CsvHelper.Configuration.Attributes;
-
-namespace PFM.Models
+﻿namespace PFM.Models
 {
     public class Category
     {
-        [Name("code")]
-        public string CatCode { get; set; }
+        public string CategoryCode { get; set; }
 
-        [Name("parent-code")]
+        public string Name { get; set; }
+
         public string? ParentCode { get; set; }
-
-        [Name("name")]
-        public string CatName { get; set; }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PFM.Database.Entities;
-using PFM.Models;
 
 namespace PFM.Database.Configurations
 {
@@ -15,7 +14,6 @@ namespace PFM.Database.Configurations
             // definisanje kolona
             builder.Property(x => x.BeneficiaryName).HasMaxLength(64);
             builder.Property(x => x.Date);
-            builder.Property(x => x.BeneficiaryName).HasMaxLength(64);
             builder.Property(x => x.Direction).HasConversion<string>().IsRequired();
             builder.Property(x => x.Amount);
             builder.Property(x => x.Description).HasMaxLength(1024);

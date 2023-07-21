@@ -4,15 +4,17 @@ using PFM.Database.Entities;
 
 namespace PFM.Database
 {
-    public class TransactionDbContext : DbContext
+    public class PfmDbContext : DbContext
     {
         public DbSet<TransactionEntity> Transactions { get; set; }
+        public DbSet<CategoryEntity> Categories { get; set; }
+        public DbSet<TransactionSplitEntity> TransactionSplits { get; set; }
 
-        public TransactionDbContext(DbContextOptions options) : base(options)
+        public PfmDbContext(DbContextOptions options) : base(options)
         {
         }
 
-        public TransactionDbContext()
+        public PfmDbContext()
         {
         }
 
@@ -21,6 +23,12 @@ namespace PFM.Database
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
             modelBuilder.ApplyConfiguration(
                 new TransactionEntityTypeConfiguration()
+                );
+            modelBuilder.ApplyConfiguration(
+                new CategoryEntityTypeConfiguration()
+                );
+            modelBuilder.ApplyConfiguration(
+                new TransactonSplitEntityTypeConfiguration()
                 );
             base.OnModelCreating(modelBuilder);
         }

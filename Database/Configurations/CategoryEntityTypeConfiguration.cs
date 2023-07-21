@@ -6,18 +6,16 @@ namespace PFM.Database.Configurations
 {
     public class CategoryEntityTypeConfiguration : IEntityTypeConfiguration<CategoryEntity>
     {
-        public CategoryEntityTypeConfiguration()
-        {
-        }
-
         public void Configure(EntityTypeBuilder<CategoryEntity> builder)
         {
             builder.ToTable("categories");
-            //  primary key
+            // primarni kljuc
             builder.HasKey(x => x.Code);
-            //  definition of columns
+            // definisanje kolona
+            builder.Property(x => x.Name).HasMaxLength(64);
             builder.Property(x => x.ParentCode);
-            builder.Property(x=>x.CatName).HasMaxLength(64);
         }
+
+
     }
 }
