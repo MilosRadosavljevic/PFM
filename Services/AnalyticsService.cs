@@ -46,7 +46,7 @@ namespace PFM.Services
                         {
                             // Pronađena je osnovna kategorija, treba joj dodati potrošnju
                             var mainGroup = spendingAnalytics.FirstOrDefault(g => g.CatCode == mainCategory.Code);
-                            if (mainGroup != null || mainCategory.Code != null)
+                            if (mainGroup != null)
                             {
                                 mainGroup.Amount += group.Amount;
                                 mainGroup.Count += group.Count;
