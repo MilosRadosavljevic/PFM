@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper.Internal.Mappers;
+using Microsoft.EntityFrameworkCore;
 using PFM.Database.Entities;
 using PFM.Models;
 
@@ -95,58 +96,102 @@ namespace PFM.Database.Repositories
             return updatedTransactionEntity;
         }
 
-        public async Task<List<TransactionEntity>> GetTransactionsByCategory(string categoryCode, DateTime? startDate, DateTime? endDate, Direction? direction)
+        public async Task<SpendingByCategory<SpendingInCategory>> GetTransactionsByCategory(string? categoryCode, DateTime? startDate, DateTime? endDate, Direction? direction)
         {
             var query = _dbContext.Transactions.AsQueryable();
-            var subCategories = await _dbContext.Categories
+
+            if (startDate.HasValue)
+            {
+                query = query.Where(x => x.Date >= startDate.Value);
+            }
+            if (endDate.HasValue)
+            {
+                query = query.Where(x => x.Date <= endDate.Value);
+            }
+            if (direction.HasValue)
+            {
+                query = query.Where(x => x.Direction == direction);
+            }
+
+            if (string.IsNullOrEmpty(categoryCode))
+            {
+                var transactions = await query.ToListAsync();
+
+                var spendingAnalytics = transactions
+                    .Where(c => c.catCode != null)
+                    .GroupBy(t => t.catCode)
+                    .Select(g => new SpendingInCategory
+                    {
+                        CatCode = g.Key,
+                        Amount = Math.Round(g.Sum(x => x.Amount), 2),
+                        Count = g.Count()
+                    })
+                    .ToList();
+
+                var categories = _dbContext.Categories.AsQueryable();
+
+                foreach (var group in spendingAnalytics.ToList())
+                {
+                    var category = categories.FirstOrDefault(c => c.Code == group.CatCode);
+                    if (category != null && !string.IsNullOrEmpty(category.ParentCode))
+                    {
+                        // Kategorija ima parent-code, što znači da je podkategorija
+                        var mainCategory = categories.FirstOrDefault(c => c.Code == category.ParentCode);
+                        if (mainCategory != null)
+                        {
+                            // Pronađena je osnovna kategorija, treba joj dodati potrošnju
+                            var mainGroup = spendingAnalytics.FirstOrDefault(g => g.CatCode == mainCategory.Code);
+                            if (mainGroup != null)
+                            {
+                                mainGroup.Amount += group.Amount;
+                                mainGroup.Count += group.Count;
+                                // Ukloniti podkategoriju iz liste
+                                spendingAnalytics.Remove(group);
+                            }
+                        }
+                    }
+                }
+                return new SpendingByCategory<SpendingInCategory>
+                {
+                    Groups = spendingAnalytics
+                };
+            }
+            else
+            {
+                var subCategories = await _dbContext.Categories
                .Where(c => c.ParentCode == categoryCode)
                .Select(c => c.Code)
                .ToListAsync();
 
+                query = query.Where(x => x.catCode == categoryCode || subCategories.Contains(x.catCode));
+                var transactions = await query.ToListAsync();
 
-            //query = query.Where(x => x.catCode == categoryCode);
+                var spendingAnalytics = transactions
+                    .Where(c => c.catCode != null)
+                    .GroupBy(t => t.catCode)
+                    .Select(g => new SpendingInCategory
+                    {
+                        CatCode = g.Key,
+                        Amount = Math.Round(g.Sum(x => x.Amount), 2),
+                        Count = g.Count()
+                    })
+                    .ToList();
 
-            query = query.Where(x => x.catCode == categoryCode || subCategories.Contains(x.catCode));
+                return new SpendingByCategory<SpendingInCategory>
+                {
+                    Groups = spendingAnalytics
+                };
 
-            if (startDate.HasValue)
-            {
-                query = query.Where(x => x.Date >= startDate.Value);
             }
-            if (endDate.HasValue)
-            {
-                query = query.Where(x => x.Date <= endDate.Value);
-            }
-            if (direction.HasValue)
-            {
-                query = query.Where(x => x.Direction == direction);
-            }
-
-            var transactions = await query.ToListAsync();
-
-            return transactions;
         }
 
-        public async Task<List<TransactionEntity>> GetAllTransactionsForAnalytics(string? categoryCode, DateTime? startDate, DateTime? endDate, Direction? direction)
-        {
-            var query = _dbContext.Transactions.AsQueryable();
+        //private string GetMainCode(string catCode)
+        //{
+        //    var query = _dbContext.Categories.AsQueryable();
+        //    var mainCategoryCode = query.Where(x => x.Code == catCode).Select(x => x.ParentCode).FirstOrDefault();
+        //    return mainCategoryCode;
+        //}
 
-            if (startDate.HasValue)
-            {
-                query = query.Where(x => x.Date >= startDate.Value);
-            }
-            if (endDate.HasValue)
-            {
-                query = query.Where(x => x.Date <= endDate.Value);
-            }
-            if (direction.HasValue)
-            {
-                query = query.Where(x => x.Direction == direction);
-            }
-
-            var transactions = await query.ToListAsync();
-
-            return transactions;
-        }
 
         public async Task DeleteTransactionSplits(TransactionEntity transactionEntity)
         {

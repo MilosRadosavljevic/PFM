@@ -18,13 +18,7 @@ namespace PFM.Database.Repositories
 
         Task<TransactionEntity> UpdateTransaction(TransactionEntity transactionEntity);
 
-        Task<List<TransactionEntity>> GetTransactionsByCategory(
-            string categoryCode,
-            DateTime? startDate,
-            DateTime? endDate,
-            Direction? direction);
-
-        Task<List<TransactionEntity>> GetAllTransactionsForAnalytics(string? categoryCode, DateTime? startDate, DateTime? endDate, Direction? direction);
+        Task<SpendingByCategory<SpendingInCategory>> GetTransactionsByCategory(string? categoryCode, DateTime? startDate, DateTime? endDate, Direction? direction);
 
         Task<TransactionSplitEntity> CreateTransactionSplit(TransactionSplitEntity splitEntity);
         Task DeleteTransactionSplits(TransactionEntity transactionEntity);

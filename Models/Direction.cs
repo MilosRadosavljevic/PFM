@@ -7,8 +7,10 @@ namespace PFM.Models
     public enum Direction
     {
         [Description("Debit")]
+        [JsonPropertyName("d")]
         d,
         [Description("Credit")]
+        [JsonPropertyName("c")]
         c,
     }
 }

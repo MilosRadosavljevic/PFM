@@ -1,9 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace PFM.Models
 {
-    public class Transaction
+    public class TransactionWithSplits
     {
         [JsonPropertyName("id")]
         public string TransactionId { get; set; }
@@ -12,7 +11,6 @@ namespace PFM.Models
         public string BeneficiaryName { get; set; }
 
         [JsonPropertyName("date")]
-        [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}")]
         public DateTime Date { get; set; }
 
         [JsonPropertyName("direction")]
@@ -36,5 +34,8 @@ namespace PFM.Models
 
         [JsonPropertyName("catcode")]
         public string? catCode { get; set; }
+
+        [JsonPropertyName("splits")]
+        public List<SingleCategorySplit>? Splits { get; set; }
     }
 }

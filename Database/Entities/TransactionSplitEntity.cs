@@ -7,9 +7,5 @@
         public string CategoryCode { get; set; }
         public CategoryEntity Category { get; set; }
         public double Amount { get; set; }
-
-
-        
-        
     }
 }

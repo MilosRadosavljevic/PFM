@@ -71,7 +71,7 @@ namespace PFM.Services
             return _mapper.Map<Transaction>(transaction);
         }
 
-        public async Task<Transaction> CreateTransactionSplit(string transactionId, SplitTransactionCommand splitTransactionCommand)
+        public async Task<TransactionWithSplits> CreateTransactionSplit(string transactionId, SplitTransactionCommand splitTransactionCommand)
         {
             double totalAmount = 0;
             var transactionEntity = await _transactionRepository.GetTransactionById(transactionId);
@@ -113,13 +113,11 @@ namespace PFM.Services
                     Amount = split.Amount
                 };
 
-                
+
                 await _transactionRepository.CreateTransactionSplit(splitEntity);
             }
 
-            var transaction = _mapper.Map<Transaction>(transactionEntity);
-
-            return transaction;
+            return _mapper.Map<TransactionWithSplits>(transactionEntity);
         }
     }
 }
