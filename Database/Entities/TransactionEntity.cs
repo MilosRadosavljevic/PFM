@@ -14,5 +14,7 @@ namespace PFM.Database.Entities
         public MccCode? MccCode { get; set; }
         public TransactionKind Kind { get; set; }
         public string? catCode { get; set; }
+        public CategoryEntity Category { get; set; }
+        public List<TransactionSplitEntity> Splits { get; set; }
     }
 }

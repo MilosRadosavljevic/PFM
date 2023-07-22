@@ -7,5 +7,8 @@
         public string Name { get; set; }
 
         public string? ParentCode { get; set; }
+
+        public List<TransactionSplitEntity> Splits { get; set; }
+
     }
 }

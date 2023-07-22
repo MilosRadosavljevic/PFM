@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PFM.Database;
@@ -11,9 +12,10 @@ using PFM.Database;
 namespace PFM.Migrations
 {
     [DbContext(typeof(PfmDbContext))]
-    partial class PfmDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230722123329_AddingSplitsTable")]
+    partial class AddingSplitsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

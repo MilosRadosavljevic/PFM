@@ -1,5 +1,4 @@
 ﻿using PFM.Commands;
-using PFM.Database.Entities;
 using PFM.Models;
 
 namespace PFM.Services
@@ -7,8 +6,8 @@ namespace PFM.Services
     public interface ITransactionService
     {
 
-        Task <Transaction> CreateTransaction(CreateTransactionCommand createTransactionCommand);
-        Task <PagedSortedListTransactions<Transaction>> GetTransactions(
+        Task<Transaction> CreateTransaction(CreateTransactionCommand createTransactionCommand);
+        Task<PagedSortedListTransactions<Transaction>> GetTransactions(
             int page,
             int pageSize,
             SortOrder sortOrder,
@@ -18,5 +17,11 @@ namespace PFM.Services
             TransactionKind? transactionKind);
 
         Task<Transaction> CategorizeTransaction(string transactionId, CategorizeTransactionCommand categorizeTransactionCommand);
+
+        Task<bool> CheckIfTransactionExistsAsync(string transactionId);
+
+        Task<Transaction> CreateTransactionSplit(string transactionId, SplitTransactionCommand splitTransactionCommand);
+
+
     }
 }

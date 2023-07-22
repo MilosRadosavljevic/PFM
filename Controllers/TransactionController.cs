@@ -63,10 +63,18 @@ namespace PFM.Controllers
             }
         }
 
-        [HttpPost("{transactionid}/split")]
-        public async Task<IActionResult> SplitTransactions()
+        [HttpPost("{transactionId}/split")]
+        public async Task<IActionResult> SplitTransactions([FromRoute] string transactionId, [FromBody] SplitTransactionCommand splitTransactionCommand)
         {
-            return Ok();
+            var transactionExists = await _transactionService.CheckIfTransactionExistsAsync(transactionId);
+            if(transactionExists == null)
+            {
+                return NotFound("Transaction doesn't exists!");
+            }
+
+            var transaction = await _transactionService.CreateTransactionSplit(transactionId, splitTransactionCommand);
+
+            return Ok(transaction);
         }
 
         [HttpPost("{transactionId}/categorize")]

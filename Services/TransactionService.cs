@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
 using PFM.Commands;
 using PFM.Database.Entities;
 using PFM.Database.Repositories;
@@ -47,7 +46,7 @@ namespace PFM.Services
         }
 
 
-        private async Task<bool> CheckIfTransactionExistsAsync(string transactionId)
+        public async Task<bool> CheckIfTransactionExistsAsync(string transactionId)
         {
             var transaction = await _transactionRepository.GetTransactionById(transactionId);
             if (transaction == null)
@@ -70,6 +69,57 @@ namespace PFM.Services
             transaction.catCode = categorizeTransactionCommand.CategoryCode;
             await _transactionRepository.UpdateTransaction(transaction);
             return _mapper.Map<Transaction>(transaction);
+        }
+
+        public async Task<Transaction> CreateTransactionSplit(string transactionId, SplitTransactionCommand splitTransactionCommand)
+        {
+            double totalAmount = 0;
+            var transactionEntity = await _transactionRepository.GetTransactionById(transactionId);
+
+            if (transactionEntity == null)
+            {
+                return null;
+            }
+
+            foreach (var split in splitTransactionCommand.Splits)
+            {
+                var category = await _categoryRepository.GetCategoryByCode(split.CategoryCode);
+                if (category == null)
+                {
+                    return null;
+                }
+
+                totalAmount += split.Amount;
+            }
+
+            if (totalAmount != transactionEntity.Amount)
+            {
+                return null;
+            }
+
+            await _transactionRepository.DeleteTransactionSplits(transactionEntity);
+
+            foreach (var split in splitTransactionCommand.Splits)
+            {
+                if (split.Amount == 0)
+                {
+                    return null;
+                }
+
+                var splitEntity = new TransactionSplitEntity
+                {
+                    TransactionId = transactionEntity.Id,
+                    CategoryCode = split.CategoryCode,
+                    Amount = split.Amount
+                };
+
+                
+                await _transactionRepository.CreateTransactionSplit(splitEntity);
+            }
+
+            var transaction = _mapper.Map<Transaction>(transactionEntity);
+
+            return transaction;
         }
     }
 }

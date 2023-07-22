@@ -15,7 +15,5 @@ namespace PFM.Database.Configurations
             builder.Property(x => x.Name).HasMaxLength(64);
             builder.Property(x => x.ParentCode);
         }
-
-
     }
 }

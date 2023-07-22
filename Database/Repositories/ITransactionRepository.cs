@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PFM.Database.Entities;
+﻿using PFM.Database.Entities;
 using PFM.Models;
 
 namespace PFM.Database.Repositories
@@ -26,5 +25,8 @@ namespace PFM.Database.Repositories
             Direction? direction);
 
         Task<List<TransactionEntity>> GetAllTransactionsForAnalytics(string? categoryCode, DateTime? startDate, DateTime? endDate, Direction? direction);
+
+        Task<TransactionSplitEntity> CreateTransactionSplit(TransactionSplitEntity splitEntity);
+        Task DeleteTransactionSplits(TransactionEntity transactionEntity);
     }
 }

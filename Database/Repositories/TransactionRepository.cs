@@ -39,45 +39,9 @@ namespace PFM.Database.Repositories
             {
                 switch (sortBy)
                 {
-                    //case "id":
-                    //    query = sortOrder == SortOrder.Asc ? query.OrderBy(x => x.Id) : query.OrderByDescending(x => x.Id);
-                    //    break;
-
-                    //case "name":
-                    //    query = sortOrder == SortOrder.Asc ? query.OrderBy(x => x.BeneficiaryName) : query.OrderByDescending(x => x.BeneficiaryName);
-                    //    break;
-
-                    //case "date":
-                    //    query = sortOrder == SortOrder.Asc ? query.OrderBy(x => x.Date) : query.OrderByDescending(x => x.Date);
-                    //    break;
-
-                    //case "direction":
-                    //    query = sortOrder == SortOrder.Asc ? query.OrderBy(x => x.Direction) : query.OrderByDescending(x => x.Direction);
-                    //    break;
-
-                    //case "amount":
-                    //    query = sortOrder == SortOrder.Asc ? query.OrderBy(x => x.Amount) : query.OrderByDescending(x => x.Amount);
-                    //    break;
-
-                    //case "description":
-                    //    query = sortOrder == SortOrder.Asc ? query.OrderBy(x => x.Description) : query.OrderByDescending(x => x.Description);
-                    //    break;
-
-                    //case "currency":
-                    //    query = sortOrder == SortOrder.Asc ? query.OrderBy(x => x.Currency) : query.OrderByDescending(x => x.Currency);
-                    //    break;
-
-                    //case "mcc":
-                    //    query = sortOrder == SortOrder.Asc ? query.OrderBy(x => x.MccCode) : query.OrderByDescending(x => x.MccCode);
-                    //    break;
-
                     case "kind":
                         query = sortOrder == SortOrder.Asc ? query.OrderBy(x => x.Kind) : query.OrderByDescending(x => x.Kind);
                         break;
-
-                        //case "catCode":
-                        //    query = sortOrder == SortOrder.Asc ? query.OrderBy(x => x.catCode) : query.OrderByDescending(x => x.catCode);
-                        //    break;
                 }
             }
             else
@@ -182,6 +146,21 @@ namespace PFM.Database.Repositories
             var transactions = await query.ToListAsync();
 
             return transactions;
+        }
+
+        public async Task DeleteTransactionSplits(TransactionEntity transactionEntity)
+        {
+            var splitsToDelete = _dbContext.TransactionSplits.
+                Where(x => x.TransactionId == transactionEntity.Id);
+            _dbContext.TransactionSplits.RemoveRange(splitsToDelete);
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<TransactionSplitEntity> CreateTransactionSplit(TransactionSplitEntity splitEntity)
+        {
+            _dbContext.TransactionSplits.Add(splitEntity);
+            await _dbContext.SaveChangesAsync();
+            return splitEntity;
         }
     }
 }

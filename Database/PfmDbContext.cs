@@ -8,6 +8,7 @@ namespace PFM.Database
     {
         public DbSet<TransactionEntity> Transactions { get; set; }
         public DbSet<CategoryEntity> Categories { get; set; }
+        public DbSet<TransactionSplitEntity> TransactionSplits { get; set; }
 
         public PfmDbContext(DbContextOptions options) : base(options)
         {
@@ -25,6 +26,9 @@ namespace PFM.Database
                 );
             modelBuilder.ApplyConfiguration(
                 new CategoryEntityTypeConfiguration()
+                );
+            modelBuilder.ApplyConfiguration(
+                new TransactionSplitEntityConfiguration()
                 );
             base.OnModelCreating(modelBuilder);
         }

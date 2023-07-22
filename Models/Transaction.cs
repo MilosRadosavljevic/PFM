@@ -25,5 +25,7 @@ namespace PFM.Models
 
         public string? catCode { get; set; }
 
+        public List<SingleCategorySplit>? Splits { get; set; }
+
     }
 }
