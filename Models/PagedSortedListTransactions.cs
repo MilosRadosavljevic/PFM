@@ -25,14 +25,20 @@ namespace PFM.Models
         [JsonPropertyName("items")]
         public List<T> Items { get; set; }
 
+        [JsonIgnore]
         [JsonPropertyName("start-date")]
         public DateTime? StartDate { get; set; }
 
+        [JsonIgnore]
         [JsonPropertyName("end-date")]
         public DateTime? EndDate { get; set; }
 
+        [JsonIgnore]
         [JsonPropertyName("transaction-kind")]
         public TransactionKind? TransactionKind { get; set; }
+
+        [JsonPropertyName("splits")]
+        public List<SingleCategorySplit>? Splits { get; set; }
 
     }
 }

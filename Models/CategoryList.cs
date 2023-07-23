@@ -2,7 +2,7 @@
 
 namespace PFM.Models
 {
-    public class PagedSortListItems<T>
+    public class CategoryList<T>
     {
         [JsonPropertyName("items")]
         public List<T> Items { get; set; }

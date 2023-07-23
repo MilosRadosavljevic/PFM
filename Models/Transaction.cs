@@ -36,5 +36,8 @@ namespace PFM.Models
 
         [JsonPropertyName("catcode")]
         public string? catCode { get; set; }
+
+        [JsonPropertyName("splits")]
+        public List<SingleCategorySplit>? Splits { get; set; }
     }
 }

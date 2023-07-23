@@ -7,7 +7,7 @@ namespace PFM.Database.Repositories
     {
         Task<CategoryEntity> CreateCategory(CategoryEntity newCategoryEntity);
         Task<CategoryEntity> GetCategoryByCode(string categoryCode);
-        Task<PagedSortListItems<CategoryEntity>> GetGategories(string parentId);
+        Task<CategoryList<CategoryEntity>> GetGategories(string parentId);
         Task<CategoryEntity> UpdateCategory(CategoryEntity existingCategory);
         Task<List<CategoryEntity>> GetAllCategories();
     }

@@ -32,7 +32,8 @@ namespace PFM.Database.Repositories
             )
         {
 
-            var query = _dbContext.Transactions.AsQueryable();
+            var query = _dbContext.Transactions.Include(x=>x.Splits).AsQueryable();
+
             var totalCount = query.Count();
             var totalPages = (int)Math.Ceiling(totalCount * 1.0 / pageSize);
 
@@ -49,24 +50,23 @@ namespace PFM.Database.Repositories
             {
                 query = query.OrderBy(x => x.Id);
             }
-
             if (transactionKind.HasValue)
             {
                 query = query.Where(x => x.Kind == transactionKind);
             }
-
             if (startDate.HasValue)
-            {
-                query = query.Where(x => x.Date >= startDate.Value);
-            }
-
             if (endDate.HasValue)
             {
                 query = query.Where(x => x.Date <= endDate.Value);
             }
-
             query = query.Skip((page - 1) * pageSize).Take(pageSize);
+
             var transactions = await query.ToListAsync();
+
+            //var splitsQuery = _dbContext.TransactionSplits.AsQueryable();
+            //var splits = splitsQuery.Where(x=>x.TransactionId == query.Where)
+            //var splits = ListFOrSplits.ForEach(x => x.Splits = splitEntityList.Where(s => s.TransactionId == x.Id).ToList());
+            
 
             return new PagedSortedListTransactions<TransactionEntity>
             {
@@ -79,8 +79,7 @@ namespace PFM.Database.Repositories
                 StartDate = startDate,
                 EndDate = endDate,
                 TransactionKind = transactionKind,
-                Items = transactions
-
+                Items = transactions,
             };
         }
 
@@ -135,18 +134,22 @@ namespace PFM.Database.Repositories
                     var category = categories.FirstOrDefault(c => c.Code == group.CatCode);
                     if (category != null && !string.IsNullOrEmpty(category.ParentCode))
                     {
-                        // Kategorija ima parent-code, što znači da je podkategorija
+                        // Provera da li kategorija ima parent-code
                         var mainCategory = categories.FirstOrDefault(c => c.Code == category.ParentCode);
                         if (mainCategory != null)
                         {
-                            // Pronađena je osnovna kategorija, treba joj dodati potrošnju
+                            // Pronalazenje osnovne kategorije
                             var mainGroup = spendingAnalytics.FirstOrDefault(g => g.CatCode == mainCategory.Code);
                             if (mainGroup != null)
                             {
                                 mainGroup.Amount += group.Amount;
                                 mainGroup.Count += group.Count;
-                                // Ukloniti podkategoriju iz liste
+                                // Sprecavanje prikaza podkategorije
                                 spendingAnalytics.Remove(group);
+                            }
+                            else
+                            {
+                                group.CatCode = mainCategory.Code;
                             }
                         }
                     }
@@ -184,13 +187,6 @@ namespace PFM.Database.Repositories
 
             }
         }
-
-        //private string GetMainCode(string catCode)
-        //{
-        //    var query = _dbContext.Categories.AsQueryable();
-        //    var mainCategoryCode = query.Where(x => x.Code == catCode).Select(x => x.ParentCode).FirstOrDefault();
-        //    return mainCategoryCode;
-        //}
 
 
         public async Task DeleteTransactionSplits(TransactionEntity transactionEntity)

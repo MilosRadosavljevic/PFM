@@ -31,7 +31,7 @@ namespace PFM.Mappings
             CreateMap<Category, CategoryEntity>()
                 .ForMember(c => c.Code, ent => ent.MapFrom(x => x.CategoryCode));
 
-            CreateMap<PagedSortListItems<CategoryEntity>, PagedSortListItems<Category>>();
+            CreateMap<CategoryList<CategoryEntity>, CategoryList<Category>>();
 
             CreateMap<CreateCategoryCommand, CategoryEntity>()
                 .ForMember(ent => ent.Code, ccc => ccc.MapFrom(x => x.CategoryCode));

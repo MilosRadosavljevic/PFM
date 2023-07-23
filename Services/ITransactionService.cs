@@ -20,7 +20,7 @@ namespace PFM.Services
 
         Task<bool> CheckIfTransactionExistsAsync(string transactionId);
 
-        Task<TransactionWithSplits> CreateTransactionSplit(string transactionId, SplitTransactionCommand splitTransactionCommand);
+        Task<Transaction> CreateTransactionSplit(string transactionId, SplitTransactionCommand splitTransactionCommand);
 
 
     }

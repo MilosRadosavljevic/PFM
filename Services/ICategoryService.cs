@@ -7,6 +7,6 @@ namespace PFM.Services
     {
         Task<Category> CreateCategory(CreateCategoryCommand createCategoryCommand);
 
-        Task<PagedSortListItems<Category>> GetGategories(string? parentId);
+        Task<CategoryList<Category>> GetGategories(string? parentId);
     }
 }

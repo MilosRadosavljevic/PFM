@@ -36,10 +36,10 @@ namespace PFM.Services
             }
         }
 
-        public async Task<PagedSortListItems<Category>> GetGategories(string parentId)
+        public async Task<CategoryList<Category>> GetGategories(string parentId)
         {
             var categories = await _repository.GetGategories(parentId);
-            return _mapper.Map<PagedSortListItems<Category>>(categories);
+            return _mapper.Map<CategoryList<Category>>(categories);
         }
 
         private async Task<bool> CheckIfCategoryExistsAsync(string categoryCode)

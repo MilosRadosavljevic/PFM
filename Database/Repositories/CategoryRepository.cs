@@ -38,7 +38,7 @@ namespace PFM.Database.Repositories
             return await _dbContext.Categories.ToListAsync();
         }
 
-        public async Task<PagedSortListItems<CategoryEntity>> GetGategories(string parentId)
+        public async Task<CategoryList<CategoryEntity>> GetGategories(string parentId)
         {
             var query = _dbContext.Categories.AsQueryable();
 
@@ -47,7 +47,7 @@ namespace PFM.Database.Repositories
                 var categories = await query
                     .Where(x => x.ParentCode == parentId)
                     .ToListAsync();
-                return new PagedSortListItems<CategoryEntity>
+                return new CategoryList<CategoryEntity>
                 {
                     Items = categories
                 };
@@ -55,7 +55,7 @@ namespace PFM.Database.Repositories
             else
             {
                 var categories = await query.ToListAsync();
-                return new PagedSortListItems<CategoryEntity>
+                return new CategoryList<CategoryEntity>
                 {
                     Items = categories
                 };

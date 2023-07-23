@@ -1,6 +1,6 @@
 ﻿using CsvHelper.Configuration.Attributes;
-using PFM.Models;
 using System.ComponentModel.DataAnnotations;
+using PFM.Models;
 
 namespace PFM.Commands
 {
