@@ -2,9 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using PFM.Commands;
 using PFM.Mappings;
-using PFM.Models;
 using PFM.Services;
 using System.Globalization;
+using PFM.Models;
+using System.ComponentModel;
 
 namespace PFM.Controllers
 {
@@ -26,11 +27,11 @@ namespace PFM.Controllers
         public async Task<IActionResult> GetTransactions (
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 10,
-            [FromQuery] SortOrder sortOrder = SortOrder.Asc,
-            [FromQuery] string? sortBy = null,
-            [FromQuery] DateTime? startDate = null,
-            [FromQuery] DateTime? endDate = null,
-            [FromQuery] TransactionKind? transactionKind = null)
+            [FromQuery(Name = "sort-order")] SortOrder sortOrder = SortOrder.Asc,
+            [FromQuery(Name = "sort-by")] string? sortBy = null,
+            [FromQuery(Name = "start-date")] DateTime? startDate = null,
+            [FromQuery(Name = "end-date")] DateTime? endDate = null,
+            [FromQuery(Name = "stransaction-kind")] string? transactionKind = null)
         {
             var transactions = await _transactionService.GetTransactions(page, pageSize, sortOrder, sortBy, startDate, endDate, transactionKind);
             return Ok(transactions);
@@ -63,25 +64,33 @@ namespace PFM.Controllers
             }
         }
 
-        [HttpPost("{transactionId}/split")]
-        public async Task<IActionResult> SplitTransactions([FromRoute] string transactionId, [FromBody] SplitTransactionCommand splitTransactionCommand)
+        [HttpPost("{id}/split")]
+        public async Task<IActionResult> SplitTransactions([FromRoute] string id, [FromBody] SplitTransactionCommand splitTransactionCommand)
         {
-            var transactionExists = await _transactionService.CheckIfTransactionExistsAsync(transactionId);
+            var transactionExists = await _transactionService.CheckIfTransactionExistsAsync(id);
             if(transactionExists == null)
             {
                 return NotFound("Transaction doesn't exists!");
             }
 
-            var transaction = await _transactionService.CreateTransactionSplit(transactionId, splitTransactionCommand);
+            var transaction = await _transactionService.CreateTransactionSplit(id, splitTransactionCommand);
 
             return Ok(transaction);
         }
 
-        [HttpPost("{transactionId}/categorize")]
-        public async Task<IActionResult> CategorizeTransactions(string transactionId, [FromBody] CategorizeTransactionCommand categorizeTransactionCommand)
+        [HttpPost("{id}/categorize")]
+        [Description("Split transaction by category")]
+        public async Task<IActionResult> CategorizeTransactions(string id, [FromBody] CategorizeTransactionCommand categorizeTransactionCommand)
         {
-            var transactionToCategorize = await _transactionService.CategorizeTransaction(transactionId, categorizeTransactionCommand);
-            return Ok(transactionToCategorize);
+            try
+            {
+                var transactionToCategorize = await _transactionService.CategorizeTransaction(id, categorizeTransactionCommand);
+                return Ok(transactionToCategorize);
+            }
+            catch
+            {
+                return NotFound("123");
+            }                
         }
 
         //[HttpPost("auto-categorize")]

@@ -19,9 +19,9 @@ namespace PFM.Controllers
 
         [HttpGet]
         public async Task<IActionResult> GetSpendingAnalytics(
-            [FromQuery] string? categoryCode,
-            [FromQuery] DateTime? startDate,
-            [FromQuery] DateTime? endDate,
+            [FromQuery(Name = "catcode")] string? categoryCode,
+            [FromQuery(Name = "start-date")] DateTime? startDate,
+            [FromQuery(Name = "end-date")] DateTime? endDate,
             [FromQuery] Direction? direction)
         {
             var spendingAnalytics = await _analyticsService.GetSpendingAnalytics(categoryCode, startDate, endDate, direction);

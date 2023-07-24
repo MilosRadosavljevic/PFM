@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using Npgsql;
 using PFM.Database;
 using PFM.Database.Repositories;
@@ -22,6 +23,16 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Personal Finance Management API",
+        Version = "v1",
+        Description = "Personal Finance Management API allows analyze of a client's spending patterns against pre-defined budgets over time"
+    });
+});
 
 
 builder.Services.AddDbContext<PfmDbContext>(opt =>

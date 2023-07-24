@@ -18,10 +18,12 @@ namespace PFM.Database.Configurations
             builder.Property(x => x.Amount);
 
             builder.HasOne(x => x.Transaction)
-                   .WithMany(t => t.Splits);
+                   .WithMany(t => t.Splits)
+                   .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(x => x.Category)
-                   .WithMany(t => t.Splits);
+                   .WithMany(t => t.Splits)
+                   .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

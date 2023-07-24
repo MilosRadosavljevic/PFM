@@ -38,7 +38,7 @@ namespace PFM.Services
             string? sortBy,
             DateTime? startDate,
             DateTime? endDate,
-            TransactionKind? transactionKind)
+            string? transactionKind)
         {
             var transactions = await _transactionRepository.GetTransactions(page, pageSize, sortOrder, sortBy,
                 startDate, endDate, transactionKind);
@@ -81,6 +81,8 @@ namespace PFM.Services
                 return null;
             }
 
+            var exinstingCatCodeInCurrentSplit = new HashSet<string>();
+
             foreach (var split in splitTransactionCommand.Splits)
             {
                 var category = await _categoryRepository.GetCategoryByCode(split.CategoryCode);
@@ -90,11 +92,13 @@ namespace PFM.Services
                 }
 
                 totalAmount += split.Amount;
-            }
 
-            if (totalAmount != transactionEntity.Amount)
-            {
-                return null;
+                if (exinstingCatCodeInCurrentSplit.Contains(split.CategoryCode))
+                {
+                    return null;
+                }
+
+                exinstingCatCodeInCurrentSplit.Add(split.CategoryCode);
             }
 
             await _transactionRepository.DeleteTransactionSplits(transactionEntity);

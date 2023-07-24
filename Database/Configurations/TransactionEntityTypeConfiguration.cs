@@ -18,11 +18,14 @@ namespace PFM.Database.Configurations
             builder.Property(x => x.Amount);
             builder.Property(x => x.Description).HasMaxLength(1024);
             builder.Property(x => x.Currency).IsRequired();
-            builder.Property(x => x.MccCode).HasConversion<string>();
+            builder.Property(x => x.MccCode)
+                .HasConversion<int?>();
             builder.Property(x => x.Kind).HasConversion<string>();
+
             builder.HasOne(x => x.Category)
-               .WithMany()
-               .HasForeignKey(x => x.catCode);
+             .WithMany()
+             .HasForeignKey(x => x.catCode)
+             .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

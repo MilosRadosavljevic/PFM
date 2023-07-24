@@ -9,7 +9,7 @@ namespace PFM.Models
         [JsonPropertyName("catcode")]
         public string CategoryCode { get; set; }
 
-        [JsonPropertyName("amout")]
+        [JsonPropertyName("amount")]
         public double Amount { get; set; }
     }
 }

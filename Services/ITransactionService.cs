@@ -14,7 +14,7 @@ namespace PFM.Services
             string? sortBy,
             DateTime? startDate,
             DateTime? endDate,
-            TransactionKind? transactionKind);
+            string? transactionKind);
 
         Task<Transaction> CategorizeTransaction(string transactionId, CategorizeTransactionCommand categorizeTransactionCommand);
 

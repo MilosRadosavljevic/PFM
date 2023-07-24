@@ -73,8 +73,8 @@ namespace PFM.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("MccCode")
-                        .HasColumnType("text");
+                    b.Property<int?>("MccCode")
+                        .HasColumnType("integer");
 
                     b.Property<string>("catCode")
                         .HasColumnType("text");
@@ -108,7 +108,8 @@ namespace PFM.Migrations
                 {
                     b.HasOne("PFM.Database.Entities.CategoryEntity", "Category")
                         .WithMany()
-                        .HasForeignKey("catCode");
+                        .HasForeignKey("catCode")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Category");
                 });
@@ -118,13 +119,13 @@ namespace PFM.Migrations
                     b.HasOne("PFM.Database.Entities.CategoryEntity", "Category")
                         .WithMany("Splits")
                         .HasForeignKey("CategoryCode")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("PFM.Database.Entities.TransactionEntity", "Transaction")
                         .WithMany("Splits")
                         .HasForeignKey("TransactionId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Category");

@@ -21,7 +21,7 @@ namespace PFM.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetCategories([FromQuery] string? parentId = null)
+        public async Task<IActionResult> GetCategories([FromQuery(Name = "parent-id")] string? parentId = null)
         {
             var categories = await _categoryService.GetGategories(parentId);
             return Ok(categories);

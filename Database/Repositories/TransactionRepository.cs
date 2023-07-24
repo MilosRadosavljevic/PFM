@@ -1,5 +1,4 @@
-﻿using AutoMapper.Internal.Mappers;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using PFM.Database.Entities;
 using PFM.Models;
 
@@ -28,7 +27,7 @@ namespace PFM.Database.Repositories
             string? sortBy = null,
             DateTime? startDate = null,
             DateTime? endDate = null,
-            TransactionKind? transactionKind = null
+            string? transactionKind = null
             )
         {
 
@@ -50,10 +49,21 @@ namespace PFM.Database.Repositories
             {
                 query = query.OrderBy(x => x.Id);
             }
-            if (transactionKind.HasValue)
+
+            if (!string.IsNullOrEmpty(transactionKind))
             {
-                query = query.Where(x => x.Kind == transactionKind);
+                if (Enum.TryParse(transactionKind, out TransactionKind parsedKind))
+                {
+                    query = query.Where(x => x.Kind == parsedKind);
+                }
+                else
+                {
+                    return null;
+                }
+
             }
+
+
             if (startDate.HasValue)
             if (endDate.HasValue)
             {
@@ -61,12 +71,7 @@ namespace PFM.Database.Repositories
             }
             query = query.Skip((page - 1) * pageSize).Take(pageSize);
 
-            var transactions = await query.ToListAsync();
-
-            //var splitsQuery = _dbContext.TransactionSplits.AsQueryable();
-            //var splits = splitsQuery.Where(x=>x.TransactionId == query.Where)
-            //var splits = ListFOrSplits.ForEach(x => x.Splits = splitEntityList.Where(s => s.TransactionId == x.Id).ToList());
-            
+            var transactions = await query.ToListAsync();            
 
             return new PagedSortedListTransactions<TransactionEntity>
             {
@@ -76,9 +81,8 @@ namespace PFM.Database.Repositories
                 PageSize = pageSize,
                 SortBy = sortBy,
                 SortOrder = sortOrder,
-                StartDate = startDate,
-                EndDate = endDate,
-                TransactionKind = transactionKind,
+                //StartDate = startDate,
+                //EndDate = endDate,
                 Items = transactions,
             };
         }
@@ -95,7 +99,7 @@ namespace PFM.Database.Repositories
             return updatedTransactionEntity;
         }
 
-        public async Task<SpendingByCategory<SpendingInCategory>> GetTransactionsByCategory(string? categoryCode, DateTime? startDate, DateTime? endDate, Direction? direction)
+        public async Task<SpendingByCategory<SpendingInCategory>> GetSpendingsByCategory(string? categoryCode, DateTime? startDate, DateTime? endDate, Direction? direction)
         {
             var query = _dbContext.Transactions.AsQueryable();
 

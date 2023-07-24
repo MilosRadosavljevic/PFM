@@ -1,4 +1,7 @@
-﻿namespace PFM.Commands
+﻿using Newtonsoft.Json;
+using System.Text.Json.Serialization;
+
+namespace PFM.Commands
 {
     public class CategorizeTransactionCommand
     {
