@@ -63,7 +63,7 @@ namespace PFM.Services
 
             if (transaction == null || category == null)
             {
-                throw new Exception("Invalid transaction or category.");
+                throw new Exception("Invalid transaction ID or category code.");
             }
 
             transaction.catCode = categorizeTransactionCommand.CategoryCode;
@@ -78,7 +78,7 @@ namespace PFM.Services
 
             if (transactionEntity == null)
             {
-                return null;
+                throw new Exception("Invalid transaction ID.");
             }
 
             var exinstingCatCodeInCurrentSplit = new HashSet<string>();
@@ -88,14 +88,14 @@ namespace PFM.Services
                 var category = await _categoryRepository.GetCategoryByCode(split.CategoryCode);
                 if (category == null)
                 {
-                    return null;
+                    throw new Exception("Invalid category ID.");
                 }
 
                 totalAmount += split.Amount;
 
                 if (exinstingCatCodeInCurrentSplit.Contains(split.CategoryCode))
                 {
-                    return null;
+                    throw new Exception("Transaction is allready splited with category code: " + split.CategoryCode);
                 }
 
                 exinstingCatCodeInCurrentSplit.Add(split.CategoryCode);
@@ -107,7 +107,7 @@ namespace PFM.Services
             {
                 if (split.Amount == 0)
                 {
-                    return null;
+                    throw new Exception("Transaction amount and splits amount aren't the same value.");
                 }
 
                 var splitEntity = new TransactionSplitEntity
