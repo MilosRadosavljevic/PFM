@@ -5,8 +5,19 @@ using PFM.Database;
 using PFM.Database.Repositories;
 using PFM.Services;
 using System.Reflection;
+using System.Text.Json.Serialization;
+
+var myLocalHostPolicy = "MyCORSPolicy";
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: myLocalHostPolicy, policy =>
+    {
+        policy.WithOrigins("http://localhost:4200").AllowAnyHeader();
+    });
+});
 
 // Add services to the container.
 builder.Services.AddScoped<ITransactionService, TransactionService>();
@@ -15,11 +26,17 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
 
-
 // AutoMapper definition
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
-builder.Services.AddControllers();
+
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(
+        new JsonStringEnumConverter(System.Text.Json.JsonNamingPolicy.CamelCase)
+        );
+    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -58,7 +75,7 @@ if (app.Environment.IsDevelopment())
 app.UseAuthorization();
 
 app.MapControllers();
-
+app.UseCors(myLocalHostPolicy);
 app.Run();
 
 string CreateConnectionString(IConfiguration configuration)
