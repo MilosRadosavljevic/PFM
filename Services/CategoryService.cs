@@ -22,7 +22,6 @@ namespace PFM.Services
             var checkIfCategoryExists = await CheckIfCategoryExistsAsync(createCategoryCommand.CategoryCode);
             if (!checkIfCategoryExists)
             {
-                // creating new category
                 var newCategoryEntity = _mapper.Map<CategoryEntity>(createCategoryCommand);
                 await _repository.CreateCategory(newCategoryEntity);
                 return _mapper.Map<Category>(newCategoryEntity);
@@ -39,6 +38,18 @@ namespace PFM.Services
         public async Task<CategoryList<Category>> GetGategories(string parentId)
         {
             var categories = await _repository.GetGategories(parentId);
+            BusinessProblem busProblem;
+
+            if (categories == null)
+            {
+                busProblem = new BusinessProblem
+                {
+                    ProblemLiteral = "Parent-id-does-not-exist",
+                    ProblemMessage = "Parent id does not exist",
+                    ProblemDetails = "Provided parent id does not exist"
+                };
+                throw new CustomException(busProblem);
+            }
             return _mapper.Map<CategoryList<Category>>(categories);
         }
 

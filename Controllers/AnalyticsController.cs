@@ -24,8 +24,19 @@ namespace PFM.Controllers
             [FromQuery(Name = "end-date")] DateTime? endDate,
             [FromQuery] Direction? direction)
         {
-            var spendingAnalytics = await _analyticsService.GetSpendingAnalytics(categoryCode, startDate, endDate, direction);
-            return Ok(spendingAnalytics);
+            try
+            {
+                var spendingAnalytics = await _analyticsService.GetSpendingAnalytics(categoryCode, startDate, endDate, direction);
+                return Ok(spendingAnalytics);
+            }
+            catch (CustomException ex)
+            {
+                if (ex.Problem is BusinessProblem)
+                {
+                    return new ObjectResult(ex.Problem) { StatusCode = 440 };
+                }
+                return new ObjectResult(ex.Problem) { StatusCode = 400 };
+            }
         }
     }
 }

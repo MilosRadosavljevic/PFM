@@ -3,6 +3,7 @@ using PFM.Commands;
 using PFM.Database.Entities;
 using PFM.Database.Repositories;
 using PFM.Models;
+using System.ComponentModel;
 
 namespace PFM.Services
 {
@@ -22,13 +23,24 @@ namespace PFM.Services
         public async Task<Transaction> CreateTransaction(CreateTransactionCommand createTransactionCommand)
         {
             var checkIfTransactionExists = await CheckIfTransactionExistsAsync(createTransactionCommand.TransactionId);
-            if (!checkIfTransactionExists)
+
+            BusinessProblem busProblem;
+
+            if (checkIfTransactionExists == true)
             {
-                var newTransactionEntity = _mapper.Map<TransactionEntity>(createTransactionCommand);
-                await _transactionRepository.CreateTransaction(newTransactionEntity);
-                return _mapper.Map<Transaction>(newTransactionEntity);
+                busProblem = new BusinessProblem
+                {
+                    ProblemLiteral = "transction-already-exist",
+                    ProblemMessage = "Transaction already exist",
+                    ProblemDetails = "Provided transaction already exist in database table 'transactions'"
+                };
+                throw new CustomException(busProblem);
+
             }
-            return null;
+            var newTransactionEntity = _mapper.Map<TransactionEntity>(createTransactionCommand);
+            await _transactionRepository.CreateTransaction(newTransactionEntity);
+            return _mapper.Map<Transaction>(newTransactionEntity);
+
         }
 
         public async Task<PagedSortedListTransactions<Transaction>> GetTransactions(
@@ -60,10 +72,30 @@ namespace PFM.Services
         {
             var transaction = await _transactionRepository.GetTransactionById(transctionId);
             var category = await _categoryRepository.GetCategoryByCode(categorizeTransactionCommand.CategoryCode);
+            ValidationProblem valProblem;
+            BusinessProblem busProblem;
+            List<Error> validationErrors = new List<Error>();
 
-            if (transaction == null || category == null)
+            if (transaction == null)
             {
-                throw new Exception("Invalid transaction ID or category code.");
+                busProblem = new BusinessProblem
+                {
+                    ProblemLiteral = "transction-id-does-not-exist",
+                    ProblemMessage = "Transaction code does not exist",
+                    ProblemDetails = "Provided transction id does not exist"
+                };
+                throw new CustomException(busProblem);
+            }
+
+            if(category == null)
+            {
+                busProblem = new BusinessProblem
+                {
+                    ProblemLiteral = "category-code-does-not-exist",
+                    ProblemMessage = "Category code does not exist",
+                    ProblemDetails = "Provided category code does not exist"
+                };
+                throw new CustomException(busProblem);
             }
 
             transaction.catCode = categorizeTransactionCommand.CategoryCode;
@@ -75,10 +107,19 @@ namespace PFM.Services
         {
             double totalAmount = 0;
             var transactionEntity = await _transactionRepository.GetTransactionById(transactionId);
+            ValidationProblem valProblem;
+            BusinessProblem busProblem;
+            List<Error> validationErrors = new List<Error>();
 
             if (transactionEntity == null)
             {
-                throw new Exception("Invalid transaction ID.");
+                // BUSINESS PROBLEM
+                busProblem = new BusinessProblem{
+                    ProblemLiteral = "transaction-id-does-not-exist",
+                    ProblemMessage = "Transaction id does not exist",
+                    ProblemDetails = "Provided transaction id does not exist"
+                };
+                throw new CustomException(busProblem);
             }
 
             var exinstingCatCodeInCurrentSplit = new HashSet<string>();
@@ -88,28 +129,52 @@ namespace PFM.Services
                 var category = await _categoryRepository.GetCategoryByCode(split.CategoryCode);
                 if (category == null)
                 {
-                    throw new Exception("Invalid category ID.");
+                    busProblem = new BusinessProblem
+                    {
+                        ProblemLiteral = "category-code-does-not-exist",
+                        ProblemMessage = "Transaction code does not exist",
+                        ProblemDetails = "Provided category code does not exist"
+                    };
+                    throw new CustomException(busProblem);
                 }
 
                 totalAmount += split.Amount;
 
                 if (exinstingCatCodeInCurrentSplit.Contains(split.CategoryCode))
                 {
-                    throw new Exception("Transaction is allready splited with category code: " + split.CategoryCode);
+                    validationErrors.Add(new Error { 
+                        Message = "Forbidden to split by the same category", 
+                        Tag = "catcode",
+                        Err = "forbidden-split-by-same-category" 
+                    });
+                    valProblem = new ValidationProblem
+                    {
+                        Errors = validationErrors
+                    };
+                    throw new CustomException(valProblem);
                 }
 
                 exinstingCatCodeInCurrentSplit.Add(split.CategoryCode);
+            }
+
+            if (totalAmount != transactionEntity.Amount)
+            {
+                //VALIDATION PROBLEM
+                validationErrors.Add(new Error { 
+                    Message = "Invalid total amount to split.", 
+                    Tag = "amount",
+                    Err = "invalid-split-amount" 
+                });
+                valProblem = new ValidationProblem { 
+                    Errors = validationErrors
+                };
+                throw new CustomException(valProblem);
             }
 
             await _transactionRepository.DeleteTransactionSplits(transactionEntity);
 
             foreach (var split in splitTransactionCommand.Splits)
             {
-                if (split.Amount == 0)
-                {
-                    throw new Exception("Transaction amount and splits amount aren't the same value.");
-                }
-
                 var splitEntity = new TransactionSplitEntity
                 {
                     TransactionId = transactionEntity.Id,

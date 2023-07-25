@@ -33,8 +33,20 @@ namespace PFM.Controllers
             [FromQuery(Name = "end-date")] DateTime? endDate = null,
             [FromQuery(Name = "stransaction-kind")] string? transactionKind = null)
         {
-            var transactions = await _transactionService.GetTransactions(page, pageSize, sortOrder, sortBy, startDate, endDate, transactionKind);
-            return Ok(transactions);
+            
+            try
+            {
+                var transactions = await _transactionService.GetTransactions(page, pageSize, sortOrder, sortBy, startDate, endDate, transactionKind);
+                return Ok(transactions);
+            }
+            catch (CustomException ex)
+            {
+                if (ex.Problem is BusinessProblem)
+                {
+                    return new ObjectResult(ex.Problem) { StatusCode = 440 };
+                }
+                return new ObjectResult(ex.Problem) { StatusCode = 400 };
+            }
         }
 
 
@@ -54,28 +66,35 @@ namespace PFM.Controllers
                         await _transactionService.CreateTransaction(record);
                     }
                 }
-
                 return Ok();
             }
-            catch (Exception ex)
+            catch (CustomException ex)
             {
-                _logger.LogError(ex, "Error importing transactions.");
-                return StatusCode(500, "An error occurred while importing transactions.");
+                if (ex.Problem is BusinessProblem)
+                {
+                    return new ObjectResult(ex.Problem) { StatusCode = 440 };
+                }
+                return new ObjectResult(ex.Problem) { StatusCode = 400 };
             }
         }
 
         [HttpPost("{id}/split")]
         public async Task<IActionResult> SplitTransactions([FromRoute] string id, [FromBody] SplitTransactionCommand splitTransactionCommand)
         {
-            var transactionExists = await _transactionService.CheckIfTransactionExistsAsync(id);
-            if(transactionExists == null)
+            try
             {
-                return NotFound("Transaction doesn't exists!");
+                var transaction = await _transactionService.CreateTransactionSplit(id, splitTransactionCommand);
+                return Ok(transaction);
             }
 
-            var transaction = await _transactionService.CreateTransactionSplit(id, splitTransactionCommand);
-
-            return Ok(transaction);
+            catch(CustomException ex)
+            {
+                if (ex.Problem is BusinessProblem)
+                {
+                    return new ObjectResult(ex.Problem) { StatusCode = 440 };
+                }
+                return new ObjectResult(ex.Problem) { StatusCode = 400 };
+            }           
         }
 
         [HttpPost("{id}/categorize")]
@@ -87,11 +106,19 @@ namespace PFM.Controllers
                 var transactionToCategorize = await _transactionService.CategorizeTransaction(id, categorizeTransactionCommand);
                 return Ok(transactionToCategorize);
             }
-            catch
+            catch(CustomException ex)
             {
-                return NotFound("123");
+                if(ex.Problem is BusinessProblem)
+                {
+                    return new ObjectResult(ex.Problem) { StatusCode = 440 };
+                }
+                return new ObjectResult(ex.Problem) { StatusCode = 400 };
+
+                //  return BadRequest(ex.Problem)
             }                
         }
+
+        //BadReques - 
 
         //[HttpPost("auto-categorize")]
         //public IActionResult AutoCategorizeTransactions()

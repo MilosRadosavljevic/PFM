@@ -29,7 +29,7 @@ namespace PFM.Database.Repositories
 
 
         public async Task<CategoryEntity> GetCategoryByCode(string categoryCode)
-        {
+        {            
             return await _dbContext.Categories.FirstOrDefaultAsync(x => x.Code.Equals(categoryCode));
         }
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PFM.Database.Entities;
 using PFM.Models;
 
@@ -50,6 +51,8 @@ namespace PFM.Database.Repositories
                 query = query.OrderBy(x => x.Id);
             }
 
+            BusinessProblem busProblem;
+
             if (!string.IsNullOrEmpty(transactionKind))
             {
                 if (Enum.TryParse(transactionKind, out TransactionKind parsedKind))
@@ -58,7 +61,13 @@ namespace PFM.Database.Repositories
                 }
                 else
                 {
-                   return null;
+                    busProblem = new BusinessProblem
+                    {
+                        ProblemLiteral = "Transaction-kind-does-not-exist",
+                        ProblemMessage = "Transaction kind does not exist",
+                        ProblemDetails = "Provided transaction kind does not exist"
+                    };
+                    throw new CustomException(busProblem);
                 }
 
             }

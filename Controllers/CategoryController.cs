@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PFM.Commands;
 using PFM.Mappings;
+using PFM.Models;
 using PFM.Services;
 using System.Globalization;
 
@@ -23,8 +24,19 @@ namespace PFM.Controllers
         [HttpGet]
         public async Task<IActionResult> GetCategories([FromQuery(Name = "parent-id")] string? parentId = null)
         {
-            var categories = await _categoryService.GetGategories(parentId);
-            return Ok(categories);
+            try
+            {
+                var categories = await _categoryService.GetGategories(parentId);
+                return Ok(categories);
+            }
+            catch (CustomException ex)
+            {
+                if (ex.Problem is BusinessProblem)
+                {
+                    return new ObjectResult(ex.Problem) { StatusCode = 440 };
+                }
+                return new ObjectResult(ex.Problem) { StatusCode = 400 };
+            }
         }
 
         [HttpPost("import")]

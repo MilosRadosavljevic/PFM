@@ -37,9 +37,5 @@ namespace PFM.Models
         [JsonIgnore]
         [JsonPropertyName("transaction-kind")]
         public TransactionKind? TransactionKind { get; set; }
-
-        [JsonPropertyName("splits")]
-        public List<SingleCategorySplit>? Splits { get; set; }
-
     }
 }
